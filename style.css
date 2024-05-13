@@ -1,0 +1,31 @@
+.results-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.pokemonSprite {
+  height: auto;
+  width: 13rem;
+}
+
+.imageContainer {
+  width: fit-content;
+  align-content: center;
+}
+
+.searchContainer {
+  align-content: center;
+  text-align: center;
+  background-color: yellow;
+  border: solid 2px blue;
+  border-radius: 20px;
+  width: fit-content;
+  padding: 10px 40px 15px;
+  margin: 0 auto;
+}
