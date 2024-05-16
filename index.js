@@ -49,11 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
       window.innerHeight + window.scrollY >= document.body.offsetHeight &&
       !isFetching
     ) {
-      if (
-        searchCategory.value === "type" ||
-        searchCategory.value === "ability" ||
-        searchCategory.value === "name"
-      ) {
+      if (["type", "ability", "name"].includes(searchCategory.value)) {
         offset += limit;
         if (searchCategory.value === "type") {
           fetchTypeData();
@@ -171,11 +167,10 @@ function fetchAbilityData() {
       const effect = data.effect_entries.find(
         (entry) => entry.language.name === "en"
       ).effect;
-      const pokemonList = data.pokemon
-        .slice(offset, offset + limit)
-        .map((p) => p.pokemon.name);
-      displayAbilities(name, effect, pokemonList);
 
+      displayAbilities(name, effect);
+
+      const pokemonList = data.pokemon.map((p) => p.pokemon.name);
       return Promise.all(
         pokemonList.map((name) =>
           fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
@@ -222,23 +217,15 @@ function displayPokemon(pokemon) {
   resultsContainer.appendChild(pokemonResultsCard);
 }
 
-function displayAbilities(name, effect, pokemonList) {
+function displayAbilities(name, effect) {
   const abilityResultsCard = abilityResultsCardTemplate.content
     .cloneNode(true)
     .querySelector(".abilityCard");
   abilityResultsCard.querySelector(".abilityName").textContent = name;
   abilityResultsCard.querySelector(".abilityEffect").textContent = effect;
-
-  let formattedPokemonList = pokemonList.join(", ");
-  if (pokemonList.length > 1) {
-    const lastCommaIndex = formattedPokemonList.lastIndexOf(", ");
-    formattedPokemonList =
-      formattedPokemonList.substring(0, lastCommaIndex) +
-      " and" +
-      formattedPokemonList.substring(lastCommaIndex + 1);
-  }
-  abilityResultsCard.querySelector(
-    ".abilityPokemon"
-  ).textContent = `Pokemon that can have this ability include ${formattedPokemonList}, see below.`;
   resultsContainer.appendChild(abilityResultsCard);
+}
+
+function displayAbilityPokemon(pokemonList) {
+  pokemonList.forEach((pokemon) => displayPokemon(pokemon));
 }
