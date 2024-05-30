@@ -13,7 +13,8 @@ const abilityResultsCardTemplate = document.querySelector(
 let offset = 0;
 const limit = 10;
 let isFetching = false;
-let fetchedAbilityData = null;
+let abilityData = null;
+let allPokemonFetched = false;
 
 searchWrapper.style.display = "none";
 searchErrorMessage.style.display = "none";
@@ -23,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function () {
     searchWrapper.style.display = "none";
     offset = 0;
     resultsContainer.innerHTML = "";
-    fetchedAbilityData = null;
 
     switch (searchCategory.value) {
       case "":
@@ -49,7 +49,8 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("scroll", () => {
     if (
       window.innerHeight + window.scrollY >= document.body.offsetHeight &&
-      !isFetching
+      !isFetching &&
+      !allPokemonFetched
     ) {
       if (["type", "ability", "name"].includes(searchCategory.value)) {
         offset += limit;
@@ -69,11 +70,10 @@ function clearSearchResults() {
   resultsContainer.innerHTML = "";
 }
 
-async function searchButtonClick() {
+function handleSubmit() {
   clearSearchResults();
   searchErrorMessage.style.display = "none";
   offset = 0;
-  fetchedAbilityData = null; // Reset the stored ability data
   if (searchCategory.value === "name") {
     fetchNameData();
   } else if (searchCategory.value === "type") {
@@ -84,6 +84,15 @@ async function searchButtonClick() {
     console.error("Invalid category");
   }
 }
+
+searchBar.addEventListener(
+  "keypress",
+  function handleKeyPressSearchInput(event) {
+    if (event.key === "Enter") {
+      handleSubmit();
+    }
+  }
+);
 
 function fetchNameData() {
   clearSearchResults();
@@ -155,8 +164,8 @@ function fetchTypeData() {
 }
 
 function fetchAbilityData() {
-  if (fetchedAbilityData) {
-    displayAbilityPokemon(fetchedAbilityData);
+  if (abilityData) {
+    displayAbilityData();
     return;
   }
 
@@ -171,28 +180,32 @@ function fetchAbilityData() {
       return response.json();
     })
     .then((data) => {
+      abilityData = data;
       const name = pokemonAbility;
       const effect = data.effect_entries.find(
         (entry) => entry.language.name === "en"
       ).effect;
 
       displayAbilities(name, effect);
-
-      const pokemonList = data.pokemon.map((p) => p.pokemon.name);
-      fetchedAbilityData = pokemonList;
-
-      return fetchPokemonList(pokemonList.slice(offset, offset + limit));
+      displayAbilityData();
     })
-    .then(() => (isFetching = false))
     .catch((error) => {
       console.error(error);
       isFetching = false;
     });
 }
 
-function fetchPokemonList(pokemonNames) {
-  return Promise.all(
-    pokemonNames.map((name) =>
+function displayAbilityData() {
+  const pokemonList = abilityData.pokemon.map((p) => p.pokemon.name);
+  const slicedPokemonList = pokemonList.slice(offset, offset + limit);
+
+  if (slicedPokemonList.length === 0) {
+    allPokemonFetched = true;
+    isFetching = false;
+    return;
+  }
+  Promise.all(
+    slicedPokemonList.map((name) =>
       fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
         .then((response) => response.json())
         .then((pokemonData) => {
@@ -208,7 +221,14 @@ function fetchPokemonList(pokemonNames) {
           displayPokemon(pokemon);
         })
     )
-  );
+  )
+    .then(() => {
+      isFetching = false;
+    })
+    .catch((error) => {
+      console.error(error);
+      isFetching = false;
+    });
 }
 
 function displayPokemon(pokemon) {
@@ -236,9 +256,4 @@ function displayAbilities(name, effect) {
   abilityResultsCard.querySelector(".abilityName").textContent = name;
   abilityResultsCard.querySelector(".abilityEffect").textContent = effect;
   resultsContainer.appendChild(abilityResultsCard);
-}
-
-function displayAbilityPokemon(pokemonList) {
-  const slicedPokemonList = pokemonList.slice(offset, offset + limit);
-  fetchPokemonList(slicedPokemonList);
 }

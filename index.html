@@ -15,14 +15,13 @@
           <option value="name">Name</option>
           <option value="type">Type</option>
           <option value="ability">Ability</option>
-          <option value="weakness">Weakness</option>
         </select>
       </div>
       <br />
       <div id="search-wrapper">
         <div id="searchBarContainer">
           <input type="text" name="searchBar" id="searchBar" />
-          <button name="searchButton" onclick="searchButtonClick()">
+          <button name="searchButton" onclick="handleSubmit()" type="button">
             Search It!
           </button>
         </div>
@@ -31,33 +30,33 @@
     </div>
     <div class="results-list">
       <div class="results-cards"></div>
+      <img class="backupImage" />
       <template data-pokemon-results-template>
         <div class="card">
           <div class="imageContainer">
-            <img class="pokemonSprite" src="" />
+            <img
+              class="pokemonSprite backupImage"
+              src="./resources/images/pokeball-transparent-png-2.png"
+            />
           </div>
           <div class="infoContainer">
             <h1 class="pokemonName"></h1>
             <p class="pokemonWeight"></p>
             <p class="pokemonType"></p>
             <p class="pokemonAbility"></p>
-            <p class="pokemonWeakness"></p>
           </div>
-          <div id="loadMorePlaceholder" style="height: 50px;"></div>
         </div>
       </template>
       <template data-ability-results-template>
         <div class="abilityCard">
           <h1 class="abilityName"></h1>
           <p class="abilityEffect"></p>
-          <p class="abilityPokemon"></p>
         </div>
       </template>
       <div id="searchErrorMessage">
         <h1>The search was ineffective. Change your input and try again!</h1>
       </div>
     </div>
-
     <script src="./resources/js/index.js"></script>
   </body>
 </html>
