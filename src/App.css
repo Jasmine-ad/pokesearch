@@ -1,0 +1,29 @@
+.search-box {
+  display: block;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+}
+
+.search-container {
+  border-bottom: 3px grey solid;
+  border-right: 3px grey solid;
+  border-radius: 12px;
+  background-color: white;
+  width: fit-content;
+  display: grid;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 20px 30px;
+}
+
+.app-container {
+  background-color: rgb(212, 212, 212);
+  height: auto;
+  padding: 10px;
+}
+
+.app-header {
+  text-align: center;
+  padding-bottom: 10px;
+}
